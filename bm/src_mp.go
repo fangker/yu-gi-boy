@@ -2,11 +2,21 @@ package bm
 
 import "github.com/fangker/yu-gi-boy/constants"
 
-var battleSrcMap = make(map[string]string)
-var gameStateSrcMap = make(map[string]string)
+type srcFileMapType map[string]string
 
-func loadSrcMap() {
+var battleSrcMap = make(srcFileMapType)
+var gameStateSrcMap = make(srcFileMapType)
+
+type srcFileMap struct {
+	battle    srcFileMapType
+	gameState srcFileMapType
+}
+
+func loadSrcFileMap() srcFileMap {
 	// game state
-	gameStateSrcMap[constants.GAME_STATE_START] = "game_state/start_game.bmp"
+	gameStateSrcMap[constants.GAME_STATE_DISCONNECT] = "game_state/disconnection.png"
 	// battle
+	sfm := srcFileMap{}
+	sfm.gameState = gameStateSrcMap
+	return sfm
 }

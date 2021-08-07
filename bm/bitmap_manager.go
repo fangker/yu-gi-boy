@@ -1,7 +1,6 @@
 package bm
 
 import (
-	"fmt"
 	"github.com/go-vgo/robotgo"
 	"log"
 	"os"
@@ -9,30 +8,39 @@ import (
 	"path/filepath"
 )
 
+type srcBitMapType map[string]robotgo.CBitmap
 type BitMapManager struct {
-	Battle    map[string]robotgo.CBitmap
-	GameState map[string]robotgo.CBitmap
+	srcPath   string
+	Battle    srcBitMapType
+	GameState srcBitMapType
 }
 
 var BitMapEntry *BitMapManager
 
-func NewBitMapManager(srcPath string) {
+func NewBitMapManager(srcPath string) *BitMapManager {
 	if srcPath == "" {
 		srcPath = path.Join(getCurrentPath(), "./src")
 	}
-	BitMapEntry = &BitMapManager{}
-	loadSrcMap()
-	fmt.Println(srcPath, gameStateSrcMap)
-	// load bitmap
+	BitMapEntry = &BitMapManager{srcPath: srcPath}
+	BitMapEntry.loadBitmapBySrcMap()
+	return BitMapEntry
 }
 
-//func loadBitmap(mpc map[string]string) {
-//	res := new(map[string]robotgo.CBitmap)
-//	for k, v := range mpc {
-//		res[k] = robotgo.OpenBitmap(path.Join())
-//	}
-//
-//}
+func (bm *BitMapManager) loadBitmapBySrcMap() {
+	srcPath := bm.srcPath
+	// load fileName map
+	sfm := loadSrcFileMap()
+	// load bitmap
+	bm.GameState = loadBitmapBySrcMap(srcPath, sfm.gameState)
+}
+func loadBitmapBySrcMap(srcRootPath string, mpc map[string]string) srcBitMapType {
+	res := make(srcBitMapType)
+	for k, v := range mpc {
+		bit := robotgo.OpenBitmap(path.Join(srcRootPath, filepath.FromSlash(v)))
+		res[k] = robotgo.CBitmap(bit)
+	}
+	return res
+}
 
 func getCurrentPath() string {
 	exePath, err := os.Executable()
