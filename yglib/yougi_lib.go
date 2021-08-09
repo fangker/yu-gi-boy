@@ -53,6 +53,8 @@ func NewYugiGame(bmManager *bm.BitMapManager) (ygg *YugiGame, err error) {
 	if hwnd == 0 {
 		return nil, errors.New("游戏未打开")
 	}
+	// if set scaling get scale for moveMouse
+	syscall.NewLazyDLL("user32.dll").NewProc("SetProcessDPIAware").Call()
 
 	var rect win.RECT
 	win.GetWindowRect(hwnd, &rect)
@@ -76,8 +78,7 @@ func NewYugiGame(bmManager *bm.BitMapManager) (ygg *YugiGame, err error) {
 	la := robotgo.GetActive() // getting C.MData of active window
 	robotgo.SetActive(la)     // Trying to set window active again with it's C.MData
 	robotgo.ActivePID(ygg.pid)
-	// if set scaling get scale for moveMouse
-	syscall.NewLazyDLL("user32.dll").NewProc("SetProcessDPIAware").Call()
+
 	ygg.scale = robotgo.Scale()
 
 	YuGiGameEntry = ygg
