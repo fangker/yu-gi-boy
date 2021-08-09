@@ -2,7 +2,6 @@ package yglib
 
 import (
 	"errors"
-	"fmt"
 	"github.com/fangker/yu-gi-boy/bm"
 	"github.com/fatih/color"
 	"github.com/go-vgo/robotgo"
@@ -27,21 +26,26 @@ type Pos struct {
 }
 
 type YugiGame struct {
-	window        win.HWND
+	hwnd          win.HWND
 	BitMapManager *bm.BitMapManager
 	pos           Pos
+	Width         int
+	Height        int
 	pid           int32
 	state         int
 	scale         int
 }
 
-func (ygg YugiGame) GetPos() Pos {
+func (ygg YugiGame) GetWindowInfo() (int, int, int, int) {
 	var rect win.RECT
-	win.GetWindowRect(ygg.window, &rect)
-	ygg.pos.x = int(rect.Left)
-	ygg.pos.y = int(rect.Top)
-	return ygg.pos
+	win.GetWindowRect(ygg.hwnd, &rect)
+	x := int(rect.Left)
+	y := int(rect.Top)
+	width := int(rect.Right - rect.Left)
+	height := int(rect.Bottom - rect.Top)
+	return x, y, width, height
 }
+
 func NewYugiGame(bmManager *bm.BitMapManager) (ygg *YugiGame, err error) {
 	green("检查游戏主体是否打开")
 	wp, _ := syscall.UTF16PtrFromString(GAME_WINDOW)
@@ -60,7 +64,7 @@ func NewYugiGame(bmManager *bm.BitMapManager) (ygg *YugiGame, err error) {
 
 	ygg = &YugiGame{}
 	ygg.BitMapManager = bmManager
-	ygg.window = hwnd
+	ygg.hwnd = hwnd
 	ygg.pos = Pos{x: posionX, y: posionY}
 	fpid, err := robotgo.FindIds(GAME_PROCCESS)
 	if fpid[0] == 0 {
@@ -129,7 +133,6 @@ func (ygg *YugiGame) FindBitMapLookForward(sbe bm.SrcBitMapEntity, checkInterval
 	for {
 		select {
 		case <-trigger.C:
-			fmt.Println("xxxx", checkInterval, tolerance)
 			x, y := robotgo.FindCBitmap(sbe.CBitmap, nil, tolerance)
 			if x != -1 && y != -1 {
 				return true

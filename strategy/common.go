@@ -38,3 +38,8 @@ func turnToPvpPage(game *yglib.YugiGame) bool {
 	}
 	return ok
 }
+
+func checkHandState(game *yglib.YugiGame) {
+	// 设置取样点
+
+}
