@@ -8,7 +8,12 @@ import (
 	"path/filepath"
 )
 
-type srcBitMapType map[string]robotgo.CBitmap
+type SrcBitMapEntity struct {
+	CBitmap    robotgo.CBitmap
+	ActionName string
+	SrcPath    string
+}
+type srcBitMapType map[string]SrcBitMapEntity
 type BitMapManager struct {
 	srcPath   string
 	Battle    srcBitMapType
@@ -32,12 +37,13 @@ func (bm *BitMapManager) loadBitmapBySrcMap() {
 	sfm := loadSrcFileMap()
 	// load bitmap
 	bm.GameState = loadBitmapBySrcMap(srcPath, sfm.gameState)
+	bm.Battle = loadBitmapBySrcMap(srcPath, sfm.battle)
 }
 func loadBitmapBySrcMap(srcRootPath string, mpc map[string]string) srcBitMapType {
 	res := make(srcBitMapType)
 	for k, v := range mpc {
 		bit := robotgo.OpenBitmap(path.Join(srcRootPath, filepath.FromSlash(v)))
-		res[k] = robotgo.CBitmap(bit)
+		res[k] = SrcBitMapEntity{CBitmap: robotgo.CBitmap(bit), ActionName: k, SrcPath: path.Join(srcRootPath, filepath.FromSlash(v))}
 	}
 	return res
 }
